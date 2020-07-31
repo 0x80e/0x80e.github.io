@@ -1,6 +1,30 @@
 <html>
 <head><title>0x80e</title></head>
 <body>
+	<h1>SIEM Tuning Part 1: Clean your room</h1>
+		<h4>July 30 2020</h4>
+		<p>&emsp;I've been doing a lot of SIEM tuning for customers lately and there are a few common themes that keep coming up.</p>
+			<ul>
+				<li>How do I start tuning this thing?</li>
+				<li>What should my first alerts be?</li>
+				<li>Help me configure some interesting alerts!</li>
+				<li>What should I be looking for in my org?</li>
+			</ul>
+
+		<h3><i>How do I start tuning this thing?</i></h3>
+		<p>&emsp;Go get your inventory of IT systems! This is a great place to start with tuning.  <u>Choose a type of system that you know the most about.</u> Do you use Active Directory? Then Domain Controllers are a great place to start. Export the IT inventory into Excel, and start marking the Domain Controllers. Not sure what Domain Controllers are in your environment? Check out this Microsoft Doc, specifically <a href="https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adforest?view=winserver2012-ps">Example#5</a>.</p>
+
+		<p>&emsp;Most SIEMs will have buckets you can put IPs or hostnames into.  These buckets can then be applied to rules that fire based on a set of conditions. Research your SIEM documentation and find where these buckets are.  For IBM QRadar, these are called "Building Block: Host Definitions". Check the list and there will be a Building Block for LDAP Servers, or Logon Servers. <u>Add the Domain Controller IPs to this bucket.</u></p>
+
+		<p>&emsp;Domain Controllers send a lot of noisy login success and failure messages, SIEMs normalize data they ingest, among other things. Some have the ability to coalesce events, if there are a lot of similar events that come in during a small time frame. This is great for some types of log sources, and not so great for others. Coalescing can cause important audit data to be merged together into a single event. For example if 6 login failures come in from the same Domain Controller, and the same user, it will combine these all into one event, but mark the event quantity as 6. If your SIEM coalesces Windows Authentication logs, it can impact how the rules fire due to the logs getting combined. <u>I recommend turning Coalescing/Log Aggregation off on Windows Log Sources to ensure each event is treated and stored on it's own.</u></p>
+
+		<p>&emsp;The list of Domain Controllers has been identified, they have been added to the appropriate buckets, and Coalescing has been turned off. Now what?... Now, the hard part. <u>Start looking through the authentication failure events, and identify any low hanging fruit to clean up.</u> Search over the course of the past week, and Identify the accounts with the most failures. Start looking into these login failures, and identify the source, and document it. Your goal today is to find 3 accounts that have a large number of authentication failures and document the source machines. Once you have those 3 accounts, hand it off to your Infrastructure team, or Help Desk to remediate.</p>
+
+		<p>&emsp;Once those 3 accounts are taken care of, identify the next set of 3 accounts. <u>Keep working away until you feel you reached a point where you are getting authentication failures due to user error.</u> This is going to help create a new normal for your organizations data, before other fun tools like User Behavior Analytics gets a chance to baseline off the old noisy data.</p>
+
+		<p>Stay tuned for Part II.</p>
+<hr>
+	<p>
 	<h1>Hello World</h1>
 		<h4>July 3 2020</h4>
 		<p>I have learned so much from the security community at large, and I wanted a place to give back to the community.  This is starting out as a static site before I put in the effort with a more robust content management system.</p>
@@ -21,6 +45,7 @@
 	* {color: #8ff586;}
 	* {font-family: CascadiaCode}
 	* {max-width: 500;}
+	* {line-height: 20pt;}
 	h4 {font-style: italic;}
 </style>
 </html>
